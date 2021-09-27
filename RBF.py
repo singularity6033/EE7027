@@ -4,7 +4,7 @@ from math import *
 from scipy.linalg import norm, pinv
 from matplotlib import pyplot as plt
 import numpy as np
-from my_SOM.SOM import som_nn.
+from my_SOM.SOM import som_nn
 from sklearn.cluster import KMeans
 
 
