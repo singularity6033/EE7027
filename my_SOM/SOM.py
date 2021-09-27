@@ -43,11 +43,11 @@ def som_nn(data, n1, n2):
     for k in range(1, 1001):
         # calculate the learning rate and width of the neighborhood function at current iteration
         eta = eta0 * math.exp(-k / 1000)
-        sigma = sigma0 * math.exp(-k / tau1);
+        sigma = sigma0 * math.exp(-k / tau1)
 
         # randomly select a training sample
         temp = np.random.permutation(nSample) - 1
-        j = temp[5]
+        j = temp[0]
         x = data[j, :]
         d = np.zeros(nNeuron)
 
@@ -85,10 +85,10 @@ def som_nn(data, n1, n2):
     return w
 
 
-input_x = np.random.rand(1000, 2)
-plt.subplot(121)
-plt.scatter(input_x[:, 0], input_x[:, 1])
-w = som_nn(input_x, 5, 6)
-plt.subplot(122)
-plt.scatter(w[:, 0], w[:, 1])
-plt.show()
+# input_x = np.random.rand(1000, 2)
+# plt.subplot(121)
+# plt.scatter(input_x[:, 0], input_x[:, 1])
+# w = som_nn(input_x, 5, 6)
+# plt.subplot(122)
+# plt.scatter(w[:, 0], w[:, 1])
+# plt.show()

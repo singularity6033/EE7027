@@ -4,6 +4,8 @@ from math import *
 from scipy.linalg import norm, pinv
 from matplotlib import pyplot as plt
 import numpy as np
+from my_SOM.SOM import som_nn
+from sklearn.cluster import KMeans
 
 
 class RBF:
@@ -11,7 +13,7 @@ class RBF:
         self.indim = indim
         self.outdim = outdim
         self.numCenters = numCenters
-        self.centers = [np.random.uniform(-1, 1, indim) for i in range(numCenters)]
+        self.centers = np.random.uniform(-1, 1, (numCenters, indim))
         self.beta = 8
         self.W = np.random.random((self.numCenters, self.outdim))
 
@@ -30,10 +32,16 @@ class RBF:
     def train(self, X, Y):
         """ X: matrix of dimensions n x indim
         y: column vector of dimension n x 1 """
-        # choose random center vectors from training set
-        rnd_idx = np.random.permutation(X.shape[0])[:self.numCenters]
-        self.centers = [X[i, :] for i in rnd_idx]
-        # print("center", self.centers)
+        # # method *1: choose random center vectors from training set
+        # rnd_idx = np.random.permutation(X.shape[0])[:self.numCenters]
+        # self.centers = X[rnd_idx, :]
+        # method *2: choose prototypes of training samples
+        # # (i): SOM
+        # self.centers = som_nn(X, 5, 4)
+        # (ii): K-means
+        k_means = KMeans(n_clusters=self.numCenters).fit(X)
+        self.centers = k_means.cluster_centers_
+        # print(type(self.centers))
         # calculate activations of RBFs
         G = self._calcAct(X)
         # calculate output weights (pseudo inverse)
@@ -52,11 +60,11 @@ if __name__ == '__main__':
     x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=0.3)
     x_test = loadmat("./data_test.mat")['data_test']
     # rbf
-    rbf = RBF(33, 10, 33)
+    rbf = RBF(33, 20, 33)
     rbf.train(x_train, y_train)
     z = rbf.test(x_validation)
     z[z > 0] = 1
     z[z < 0] = -1
-    temp = np.where((z-y_validation) == 0)
-    accuracy = len(temp[0])/len(y_validation)
+    temp = np.where((z - y_validation) == 0)
+    accuracy = len(temp[0]) / len(y_validation)
     print("validation accuracy is {:.2%}".format(accuracy))
