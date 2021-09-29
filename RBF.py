@@ -1,4 +1,4 @@
-from sklearn import *
+from sklearn import model_selection
 from scipy.io import loadmat
 from math import *
 from scipy.linalg import norm, pinv
@@ -33,7 +33,7 @@ class RBF:
 
     def _calcAct(self, X):
         # calculate activations of RBFs
-        G = np.zeros((X.shape[0], self.numCenters), float)
+        G = np.zeros((X.shape[0], self.centers.shape[0]), float)
         for ci, c_val in enumerate(self.centers):
             for xi, x_val in enumerate(X):
                 G[xi, ci] = self.basisfunc(c_val, x_val)
@@ -63,6 +63,7 @@ class RBF:
 
     def train_RS(self, X, Y):
         """
+        Method #1
             This function uses randomly selection from training samples
             to construct the location of centers.
             sigma can be calculated by: d(max)/sqrt(2*m)
@@ -79,6 +80,7 @@ class RBF:
 
     def train_PT(self, X, Y, som_h=1, som_w=1):
         """
+        Method #2
             This function uses prototypes selected from training samples
             to construct the location of centers.
             som and k-means methods can be used.
@@ -99,6 +101,7 @@ class RBF:
 
     def train_NLPB(self, X, Y, iter_num, eta1, eta2, eta3):
         """
+        Method #3
             This function uses non-linear optimization method
             based on error-correction learning (using GD).
             X: matrix of dimensions n x indim
@@ -119,6 +122,43 @@ class RBF:
             self.centers -= eta2 * dEdc
             self.sigma -= eta3 * dEds
 
+    def train_MS(self, X, Y):
+        """
+        Method #4
+            This function uses model selection method to choose center location
+            (sequential forward selection algorithm). And the stopping criterion
+            is pre-defined accuracy.
+            X: matrix of dimensions n x indim
+            Y: column vector of dimension n x 1
+        """
+        numCenters = 1
+        Candidates = X
+        # self.W = np.empty((1, self.outdim))
+        self.centers = np.zeros((1, self.indim))
+        while numCenters <= self.numCenters:
+            err = []
+            for i in range(len(Candidates)):
+                self.centers[numCenters-1, :] = Candidates[i, :]
+                # calculate activations of RBF
+                G = self._calcAct(X)
+                # calculate output weights (pseudo inverse)
+                self.W = np.dot(np.dot(np.linalg.pinv(np.dot(G.T, G)), G.T), Y)
+                Y_predict = self.test(X)
+                err.append(self.calcAccuracy(Y_predict, Y))
+            indx = np.argmax(err)
+            self.centers[numCenters - 1, :] = Candidates[indx, :]
+            print(self.centers.shape)
+            self.centers = np.append(self.centers, np.zeros((1, self.indim)), axis=0)
+            Candidates = np.delete(Candidates, indx, axis=0)
+            numCenters += 1
+        self.centers = np.delete(self.centers, -1, axis=0)
+
+    def calcAccuracy(self, Y, Y_g):
+        Y[Y >= 0] = 1
+        Y[Y <= 0] = 0
+        accuracy = len(np.where((Y - Y_g) == 0)[0]) / len(Y_g)
+        return accuracy
+
     def test(self, X):
         """ X: matrix of dimensions n x indim """
         G = self._calcAct(X)
@@ -129,14 +169,12 @@ class RBF:
 if __name__ == '__main__':
     x = loadmat("./data_train.mat")['data_train']
     y = loadmat("./label_train.mat")['label_train']
-    x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=0.3)
+    x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=0.4)
     x_test = loadmat("./data_test.mat")['data_test']
     # rbf
     rbf = RBF(33, 20, 1)
-    rbf.train_NLPB(x_train, y_train, 50, 0.04, 0.04, 0.5)
-    z = rbf.test(x_validation)
-    z[z > 0] = 1
-    z[z < 0] = -1
-    temp = np.where((z - y_validation) == 0)
-    accuracy = len(temp[0]) / len(y_validation)
-    print("validation accuracy is {:.2%}".format(accuracy))
+    rbf.train_MS(x_train, y_train)
+    y_predict = rbf.test(x_validation)
+    print("accuracy is {:.2%}".format(rbf.calcAccuracy(y_predict, y_validation)))
+
+

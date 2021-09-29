@@ -9,11 +9,16 @@ from scipy.linalg import norm, pinv
 # print(np.sum(a,axis=-1))
 # mat1 = np.expand_dims(a, 0).repeat(a.shape[0], 0)
 # print(np.max(pairwise_distances(a)))
-c = np.zeros((2,3))
-c[0,:] = np.array([1,2,3])
+c = np.zeros((1, 3))
+# c[0, :] = np.array([1, 2, 3])
 a = np.array([[1, 2], [3, 4], [5, 6]])
-b = np.array([[1, 3]])
-print(cdist(a, b))
+b = np.array([[1, 3, 4]])
+# e = [1,2,3,4]
+# d = np.empty((1,2))
+# d = np.append(d, b, axis=0)
+# b[, :] = np.array([[8, 3]])
+print(b.shape)
+print(np.append(c,b,axis=0))
 # b = np.expand_dims(a, -1)
 # print(np.array([[1,2,3]]).shape)
 
@@ -32,5 +37,3 @@ print(cdist(a, b))
 #
 #
 # print(matrix_dist(a))
-
-
