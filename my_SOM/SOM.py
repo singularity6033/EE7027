@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import pairwise_distances
 from scipy.spatial.distance import cdist
 import math
 
@@ -7,7 +8,7 @@ import math
 def distance_matrix(n1, n2):
     # this function calculate the lateral distance between neurons in the 2D lattice
     # Dist(i, j) denotes the distance between neurons i and j
-
+    # pairwise_distances()
     # define the position of all neurons in the 2D lattice
     posit = np.zeros((n1 * n2, 2))
     for i in range(1, n1 + 1):
