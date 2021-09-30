@@ -97,7 +97,7 @@ class RBF:
         # calculate activations of RBF
         G = self._calcAct(X)
         # calculate output weights (pseudo inverse)
-        self.W = np.dot(np.dot(np.linalg.inv(np.dot(G.T, G)), G.T), Y)
+        self.W = np.dot(np.dot(np.linalg.pinv(np.dot(G.T, G)), G.T), Y)
 
     def train_NLPB(self, X, Y, iter_num, eta1, eta2, eta3):
         """
@@ -138,7 +138,7 @@ class RBF:
         while numCenters <= self.numCenters:
             err = []
             for i in range(len(Candidates)):
-                self.centers[numCenters-1, :] = Candidates[i, :]
+                self.centers[numCenters - 1, :] = Candidates[i, :]
                 # calculate activations of RBF
                 G = self._calcAct(X)
                 # calculate output weights (pseudo inverse)
@@ -169,12 +169,62 @@ class RBF:
 if __name__ == '__main__':
     x = loadmat("./data_train.mat")['data_train']
     y = loadmat("./label_train.mat")['label_train']
-    x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=0.4)
+    x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=0.2)
     x_test = loadmat("./data_test.mat")['data_test']
-    # rbf
-    rbf = RBF(33, 20, 1)
-    rbf.train_MS(x_train, y_train)
-    y_predict = rbf.test(x_validation)
-    print("accuracy is {:.2%}".format(rbf.calcAccuracy(y_predict, y_validation)))
-
-
+    # rbf training process and evaluate performance
+    accuracy = np.zeros((4, 2, 32))
+    # 1st method
+    for i in range(32):
+        rbf = RBF(33, i + 2, 1)
+        rbf.train_RS(x_train, y_train)
+        y_train_predict = rbf.test(x_train)
+        y_validation_predict = rbf.test(x_validation)
+        accuracy[0, 0, i] = rbf.calcAccuracy(y_train_predict, y_train)
+        accuracy[0, 1, i] = rbf.calcAccuracy(y_validation_predict, y_validation)
+    print("done")
+    # 2nd method
+    for i in range(32):
+        rbf = RBF(33, i + 2, 1)
+        rbf.train_PT(x_train, y_train)
+        y_train_predict = rbf.test(x_train)
+        y_validation_predict = rbf.test(x_validation)
+        accuracy[1, 0, i] = rbf.calcAccuracy(y_train_predict, y_train)
+        accuracy[1, 1, i] = rbf.calcAccuracy(y_validation_predict, y_validation)
+    print("done")
+    # 3rd method
+    for i in range(32):
+        rbf = RBF(33, i + 2, 1)
+        rbf.train_NLPB(x_train, y_train, 50, 0.05, 0.05, 0.5)
+        y_train_predict = rbf.test(x_train)
+        y_validation_predict = rbf.test(x_validation)
+        accuracy[2, 0, i] = rbf.calcAccuracy(y_train_predict, y_train)
+        accuracy[2, 1, i] = rbf.calcAccuracy(y_validation_predict, y_validation)
+    print("done")
+    # 4th method
+    for i in range(30):
+        rbf = RBF(33, i + 2, 1)
+        rbf.train_MS(x_train, y_train)
+        y_train_predict = rbf.test(x_train)
+        y_validation_predict = rbf.test(x_validation)
+        accuracy[3, 0, i] = rbf.calcAccuracy(y_train_predict, y_train)
+        accuracy[3, 1, i] = rbf.calcAccuracy(y_validation_predict, y_validation)
+# print("accuracy is {:.2%}".format())
+#
+x = np.linspace(2, 33, 1)
+plt.figure(1)
+for i in range(4):
+    plt.plot(x, accuracy[i, 0, :])
+plt.title("Accuracy of training set")
+plt.xlabel("Number of neurons in the hidden layer")
+plt.ylabel("Accuracy")
+plt.legend(['Method 1', 'Method 2', 'Method 3', 'Method 4'], loc="best")
+plt.show()
+# plt.savefig('svm.jpg')
+plt.figure(2)
+for i in range(4):
+    plt.plot(x, accuracy[i, 1, :])
+plt.title("Accuracy of validation set")
+plt.xlabel("Number of neurons in the hidden layer")
+plt.ylabel("Accuracy")
+plt.legend(['Method 1', 'Method 2', 'Method 3', 'Method 4'], loc="best")
+plt.show()
