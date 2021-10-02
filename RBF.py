@@ -155,7 +155,7 @@ class RBF:
 
     def calcAccuracy(self, Y, Y_g):
         Y[Y >= 0] = 1
-        Y[Y <= 0] = 0
+        Y[Y <= 0] = -1
         accuracy = len(np.where((Y - Y_g) == 0)[0]) / len(Y_g)
         return accuracy
 
@@ -194,14 +194,14 @@ if __name__ == '__main__':
     # 3rd method
     for i in range(32):
         rbf = RBF(33, i + 2, 1)
-        rbf.train_NLPB(x_train, y_train, 50, 0.05, 0.05, 0.5)
+        rbf.train_NLPB(x_train, y_train, 200, 0.5, 0.5, 0.5)
         y_train_predict = rbf.test(x_train)
         y_validation_predict = rbf.test(x_validation)
         accuracy[2, 0, i] = rbf.calcAccuracy(y_train_predict, y_train)
         accuracy[2, 1, i] = rbf.calcAccuracy(y_validation_predict, y_validation)
     print("done")
     # 4th method
-    for i in range(30):
+    for i in range(32):
         rbf = RBF(33, i + 2, 1)
         rbf.train_MS(x_train, y_train)
         y_train_predict = rbf.test(x_train)
@@ -210,21 +210,29 @@ if __name__ == '__main__':
         accuracy[3, 1, i] = rbf.calcAccuracy(y_validation_predict, y_validation)
 # print("accuracy is {:.2%}".format())
 #
-x = np.linspace(2, 33, 1)
+x = np.linspace(2, 33, 32)
+print(x)
 plt.figure(1)
-for i in range(4):
-    plt.plot(x, accuracy[i, 0, :])
+plt.plot(x, accuracy[0, 0, :], marker='o')
+plt.plot(x, accuracy[1, 0, :], marker='v')
+plt.plot(x, accuracy[2, 0, :], marker='x')
+plt.plot(x, accuracy[3, 0, :], marker='s')
+plt.grid()
+plt.ylim([0, 1])
 plt.title("Accuracy of training set")
 plt.xlabel("Number of neurons in the hidden layer")
 plt.ylabel("Accuracy")
 plt.legend(['Method 1', 'Method 2', 'Method 3', 'Method 4'], loc="best")
-plt.show()
-# plt.savefig('svm.jpg')
+plt.savefig('rbf1.jpg')
 plt.figure(2)
-for i in range(4):
-    plt.plot(x, accuracy[i, 1, :])
+plt.plot(x, accuracy[0, 1, :], marker='o')
+plt.plot(x, accuracy[1, 1, :], marker='v')
+plt.plot(x, accuracy[2, 1, :], marker='x')
+plt.plot(x, accuracy[3, 1, :], marker='s')
+plt.grid()
+plt.ylim([0, 1])
 plt.title("Accuracy of validation set")
 plt.xlabel("Number of neurons in the hidden layer")
 plt.ylabel("Accuracy")
 plt.legend(['Method 1', 'Method 2', 'Method 3', 'Method 4'], loc="best")
-plt.show()
+plt.savefig('rbf2.jpg')
