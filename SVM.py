@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 x = loadmat("./data_train.mat")['data_train']
 y = loadmat("./label_train.mat")['label_train']
-x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=0.4)
+x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=0.2)
 x_test = loadmat("./data_test.mat")['data_test']
 
 gamma = 0.1
@@ -41,4 +41,4 @@ plt.legend(['training set', 'validation set', 'training set with gamma=1/n_featu
 # plt.show()
 plt.savefig('svm.jpg')
 
-y_test = svm_obj[1].predict(x_test)
+y_test = svm_obj[3].predict(x_test)
