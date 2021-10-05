@@ -152,6 +152,9 @@ class RBF:
             Candidates = np.delete(Candidates, indx, axis=0)
             numCenters += 1
         self.centers = np.delete(self.centers, -1, axis=0)
+        G = self._calcAct(X)
+        # calculate output weights (pseudo inverse)
+        self.W = np.dot(np.dot(np.linalg.pinv(np.dot(G.T, G)), G.T), Y)
 
     def calcAccuracy(self, Y, Y_g):
         Y[Y >= 0] = 1
