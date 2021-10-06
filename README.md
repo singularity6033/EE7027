@@ -1,1 +1,1 @@
-### This is the code source of EE7207's continuous assignment
+### This is the code of EE7207's continuous assignment
