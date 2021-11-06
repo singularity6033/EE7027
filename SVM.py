@@ -28,6 +28,7 @@ train_score_auto = clf.score(x_train, y_train)
 validation_auto = clf.score(x_validation, y_validation)
 
 x = np.linspace(0.1, 1, 10)
+plt.figure()
 plt.plot(x, train_score, x, validation_score, marker=".")
 plt.scatter(1/x_train.shape[0], train_score_auto,  marker="x")
 plt.scatter(1/x_train.shape[0], validation_auto, marker="x")
@@ -38,7 +39,7 @@ plt.ylabel("Accuracy")
 plt.ylim([0.8, 1])
 plt.legend(['training set', 'validation set', 'training set with gamma=1/n_features',
             'validation set with gamma=1/n_features'], loc="best")
-# plt.show()
-plt.savefig('svm.jpg')
+plt.show()
+# plt.savefig('svm.jpg')
 
 y_test = svm_obj[3].predict(x_test)
