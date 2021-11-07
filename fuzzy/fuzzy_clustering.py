@@ -19,7 +19,7 @@ dataset = np.array([[0.1, 0.0, 0.2, 0.8, 0.3, 0.0, 0.5, 0.6, 0.0, 0.1, 0.3, 0.1,
                     [0.2, 0.5, 0.2, 0.0, 0.4, 0.0, 0.4, 0.0, 0.1, 0.0, 0.1, 0.4, 0.2, 0.1, 0.1, 0.2],
                     [0.0, 0.0, 0.4, 0.1, 0.3, 0.6, 0.1, 0.1, 0.4, 0.3, 0.4, 0.0, 0.6, 0.1, 0.1, 0.2]])
 dataset = dataset.T
-# calculate cosine similarity
+# calculate cosine similarity to generate fuzzy tolerance relation
 R1 = np.zeros((16, 16))
 for i in range(16):
     for j in range(16):
@@ -33,9 +33,6 @@ R = np.zeros((16, 16))
 while 1:
     for i in range(16):
         for j in range(16):
-            # index = R1[i, :] <= R1[:, j]
-            # temp[index] = R1[i, :][index]
-            # temp[~index] = R1[:, j].T[index]
             R_temp[i, j] = np.max(minimum_vector(R1[i, :], R1[:, j].T))
     if (R_temp == R1).all():
         break
