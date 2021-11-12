@@ -37,7 +37,7 @@ while 1:
     if (R_temp == R1).all():
         break
     else:
-        R1 = R_temp
+        R1 = R_temp.copy()
 R = R_temp
 print((R == R1).all())
 # alpha-cut
@@ -49,7 +49,7 @@ R_08[R >= 0.8] = 1
 # iterate alpha-cut
 alpha = 1
 temp = []
-while len(temp) != 3:
+while len(temp) != 2:
     R_alpha = np.zeros((16, 16))
     R_alpha[R >= alpha] = 1
     temp = [R_alpha[0, :]]
@@ -61,4 +61,5 @@ while len(temp) != 3:
                 break
         if not flag:
             temp.append(R_alpha[i, :])
-    alpha -= 0.01
+    alpha -= 0.001
+alpha += 0.001
